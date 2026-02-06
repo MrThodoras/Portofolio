@@ -40,29 +40,22 @@
             min-height: 100vh;
         }
 
-        /* Animated gradient background */
+        /* Static gradient background - FAST */
         body::before {
             content: '';
             position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(122, 82, 149, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(163, 116, 201, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(78, 205, 196, 0.15) 0%, transparent 50%);
-            animation: gradientShift 20s ease infinite;
+                radial-gradient(circle at 20% 80%, rgba(122, 82, 149, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(163, 116, 201, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(78, 205, 196, 0.1) 0%, transparent 50%);
             z-index: -1;
         }
 
-        @keyframes gradientShift {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(-5%, 5%) rotate(120deg); }
-            66% { transform: translate(5%, -5%) rotate(240deg); }
-        }
-
-        /* Noise texture overlay */
+        /* Lighter noise texture */
         body::after {
             content: '';
             position: fixed;
@@ -70,9 +63,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
             pointer-events: none;
             z-index: 100;
+            opacity: 0.6;
         }
 
         .container {
@@ -98,8 +92,9 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             box-shadow: 0 5px 20px rgba(90, 63, 125, 0.3);
+            will-change: transform;
         }
 
         .home-button:hover {
@@ -111,7 +106,7 @@
         .home-button::before {
             content: '←';
             font-size: 1.5rem;
-            transition: transform 0.3s ease;
+            transition: transform 0.15s ease;
         }
 
         .home-button:hover::before {
@@ -133,13 +128,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: fadeInDown 0.8s ease-out;
+            animation: fadeInDown 0.6s ease-out;
         }
 
         @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(-30px);
+                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
@@ -153,13 +148,13 @@
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 3rem;
             padding: 4rem 0;
-            animation: fadeInUp 1s ease-out;
+            animation: fadeInUp 0.6s ease-out;
         }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -174,9 +169,10 @@
             border: 2px solid rgba(163, 116, 201, 0.3);
             border-radius: 25px;
             padding: 2rem;
-            transition: all 0.4s ease;
+            transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            will-change: transform;
         }
 
         .bot-card::before {
@@ -188,13 +184,13 @@
             height: 100%;
             background: linear-gradient(135deg, rgba(163, 116, 201, 0.1), transparent);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.2s ease;
         }
 
         .bot-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             border-color: var(--accent-pink);
-            box-shadow: 0 20px 60px rgba(255, 107, 157, 0.3);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.3);
         }
 
         .bot-card:hover::before {
@@ -209,12 +205,12 @@
             object-fit: cover;
             margin-bottom: 1.5rem;
             border: 2px solid var(--purple-500);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .bot-card:hover .bot-image {
             border-color: var(--accent-cyan);
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
 
         /* Bot Title */
@@ -260,20 +256,21 @@
 
         /* Copy Button */
         .copy-button {
-            padding: 0.5rem 0.8rem;
+            padding: 0.35rem 0.6rem;
             background: linear-gradient(135deg, var(--purple-600), var(--accent-pink));
             color: var(--text-primary);
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
             white-space: nowrap;
-            min-width: 70px;
+            min-width: 60px;
+            will-change: transform;
         }
 
         .copy-button:hover {
@@ -282,7 +279,7 @@
         }
 
         .copy-button:active {
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
 
         .copy-button.copied {
@@ -290,7 +287,7 @@
         }
 
         .copy-icon {
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
 
         /* Responsive */
@@ -375,7 +372,7 @@
         <div class="bots-grid">
             <!-- Bot Card 1 -->
             <div class="bot-card">
-                <img src="Images\Bots\TSABot.png" alt="TSA Bot" class="bot-image">
+                <img src="Images/Bots/TSABot.png" alt="TSA Bot" class="bot-image">
                 <h2 class="bot-title">🍃 TSA Bot</h2>
                 <p class="bot-description">Advanced community Bot made with pure love!</p>
                 <div class="invite-container">
@@ -389,7 +386,7 @@
 
             <!-- Bot Card 2 -->
             <div class="bot-card">
-                <img src="Images\Bots\Soon.png" alt="Music Bot" class="bot-image">
+                <img src="Images/Bots/Soon.png" alt="Music Bot" class="bot-image">
                 <h2 class="bot-title">🎵 Music Bot</h2>
                 <p class="bot-description">High-quality music streaming for your Discord server. Support for multiple platforms and queue management.</p>
                 <div class="invite-container">
@@ -403,7 +400,7 @@
 
             <!-- Bot Card 3 -->
             <div class="bot-card">
-                <img src="Images\Bots\Soonp.png" alt="Utility Bot" class="bot-image">
+                <img src="Images/Bots/Soonp.png" alt="Utility Bot" class="bot-image">
                 <h2 class="bot-title">🔧 Utility Bot</h2>
                 <p class="bot-description">Essential server utilities including polls, reminders, custom commands, and server statistics.</p>
                 <div class="invite-container">
@@ -414,13 +411,11 @@
                     </button>
                 </div>
             </div>
-
-
         </div>
     </section>
 
     <script>
-        // Custom cursor with smooth animation
+        // Custom cursor with smooth animation - FAST
         const cursor = document.querySelector('.cursor');
         const cursorFollower = document.querySelector('.cursor-follower');
         
@@ -434,21 +429,23 @@
         });
 
         function animateCursor() {
-            cursorX += (mouseX - cursorX) * 0.3;
-            cursorY += (mouseY - cursorY) * 0.3;
+            // Faster interpolation
+            cursorX += (mouseX - cursorX) * 0.5;
+            cursorY += (mouseY - cursorY) * 0.5;
             
-            followerX += (mouseX - followerX) * 0.15;
-            followerY += (mouseY - followerY) * 0.15;
+            followerX += (mouseX - followerX) * 0.25;
+            followerY += (mouseY - followerY) * 0.25;
             
-            cursor.style.transform = `translate(${cursorX - 10}px, ${cursorY - 10}px)`;
-            cursorFollower.style.transform = `translate(${followerX - 20}px, ${followerY - 20}px)`;
+            // GPU acceleration
+            cursor.style.transform = `translate3d(${cursorX - 10}px, ${cursorY - 10}px, 0)`;
+            cursorFollower.style.transform = `translate3d(${followerX - 20}px, ${followerY - 20}px, 0)`;
             
             requestAnimationFrame(animateCursor);
         }
         
         animateCursor();
 
-        // Copy invite link function
+        // WORKING Copy invite link function
         async function copyInvite(button) {
             const input = button.parentElement.querySelector('.invite-input');
             const copyText = button.querySelector('.copy-text');
@@ -514,7 +511,4 @@
         }
     </script>
 </body>
-
 </html>
-
-
