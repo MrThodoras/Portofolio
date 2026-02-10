@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Projects - Riris</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="Images/icons/ricon.png">
+    <style>
+        :root {
+            --purple-900: #1a0b2e;
+            --purple-800: #2d1b4e;
+            --purple-700: #3f2d5c;
+            --purple-600: #5a3f7d;
+            --purple-500: #7c5295;
+            --purple-400: #a374c9;
+            --purple-300: #c49ddb;
+            --purple-200: #dcc5e8;
+            --accent-pink: #ff6b9d;
+            --accent-cyan: #4ecdc4;
+            --accent-lime: #a8ff3e;
+            --bg-dark: #0d0618;
+            --text-primary: #f5f0ff;
+            --text-secondary: #c49ddb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Static gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(122, 82, 149, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(163, 116, 201, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(78, 205, 196, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Lighter noise texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulance type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Home Button */
+        .home-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--purple-700), var(--purple-600));
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 50px;
+            border: 2px solid var(--purple-500);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+            box-shadow: 0 5px 20px rgba(90, 63, 125, 0.3);
+            will-change: transform;
+        }
+
+        .home-button:hover {
+            transform: translateX(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .home-button::before {
+            content: '←';
+            font-size: 1.5rem;
+            transition: transform 0.15s ease;
+        }
+
+        .home-button:hover::before {
+            transform: translateX(-5px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--purple-300), var(--accent-pink), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+            padding: 4rem 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Project Card */
+        .project-card {
+            background: linear-gradient(135deg, rgba(47, 27, 78, 0.6), rgba(45, 27, 78, 0.4));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(163, 116, 201, 0.3);
+            border-radius: 25px;
+            padding: 2rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(163, 116, 201, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-pink);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.3);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Project Header */
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 5px 15px rgba(163, 116, 201, 0.4));
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Project Description */
+        .project-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        /* Tech Tags */
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-tag {
+            background: rgba(163, 116, 201, 0.2);
+            border: 1px solid var(--purple-500);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--purple-200);
+        }
+
+        /* Project Stats */
+        .project-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(163, 116, 201, 0.2);
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Download Button */
+        .download-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--purple-600), var(--accent-pink));
+            color: var(--text-primary);
+            border: 2px solid var(--purple-500);
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.4s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+        }
+
+        .download-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .download-icon {
+            font-size: 1.3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .home-button {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 6rem 0 2rem;
+            }
+
+            .project-stats {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
+
+        /* Custom cursor effect */
+        @media (pointer: fine) {
+            * {
+                cursor: none;
+            }
+
+            button, a, input[type="button"], input[type="submit"] {
+                cursor: pointer !important;
+            }
+
+            .cursor {
+                width: 20px;
+                height: 20px;
+                border: 2px solid var(--accent-pink);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 9999;
+                mix-blend-mode: difference;
+            }
+
+            .cursor-follower {
+                width: 40px;
+                height: 40px;
+                border: 1px solid var(--purple-400);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 9998;
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Home Button -->
+    <a href="index.html#projects" class="home-button">Home</a>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>🐍 Python Projects</h1>
+            <p class="hero-subtitle">// Download, test, and explore my Python creations</p>
+        </div>
+    </section>
+
+    <!-- Projects Grid -->
+    <section class="container">
+        <div class="projects-grid">
+            <!-- Project Card 1 -->
+            <div class="project-card">
+                <div class="project-header">
+                    <div class="project-icon">🎮</div>
+                    <h2 class="project-title">Snake Game</h2>
+                </div>
+                <p class="project-description">
+                    Classic snake game built with Pygame. Features smooth controls, score tracking, and increasing difficulty. Perfect for learning game development basics.
+                </p>
+                <div class="tech-tags">
+                    <span class="tech-tag">pygame</span>
+                    <span class="tech-tag">OOP</span>
+                    <span class="tech-tag">game-dev</span>
+                </div>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-icon">📁</span>
+                        <span>~50 KB</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">📝</span>
+                        <span>~200 lines</span>
+                    </div>
+                </div>
+                <a href="path/to/snake-game.zip" class="download-btn" download>
+                    <span class="download-icon">⬇️</span>
+                    <span>Download Project</span>
+                </a>
+            </div>
+
+            <!-- Project Card 2 -->
+            <div class="project-card">
+                <div class="project-header">
+                    <div class="project-icon">🔐</div>
+                    <h2 class="project-title">Password Manager</h2>
+                </div>
+                <p class="project-description">
+                    Secure password manager with encryption. Store and retrieve passwords safely with a master password. Uses cryptography library for AES encryption.
+                </p>
+                <div class="tech-tags">
+                    <span class="tech-tag">cryptography</span>
+                    <span class="tech-tag">security</span>
+                    <span class="tech-tag">CLI</span>
+                </div>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-icon">📁</span>
+                        <span>~30 KB</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">📝</span>
+                        <span>~150 lines</span>
+                    </div>
+                </div>
+                <a href="path/to/password-manager.zip" class="download-btn" download>
+                    <span class="download-icon">⬇️</span>
+                    <span>Download Project</span>
+                </a>
+            </div>
+
+            <!-- Project Card 3 -->
+            <div class="project-card">
+                <div class="project-header">
+                    <div class="project-icon">🖩</div>
+                    <h2 class="project-title">Secret Calculator</h2>
+                </div>
+                <p class="project-description">
+                    Normally working Calculator with a hidden .txt file that its content can be read or edited via the proggram! Just give as an input <b>1312</b> on the selection to enter the menu.
+                </p>
+                <div class="tech-tags">
+                    <span class="tech-tag">matplotlib</span>
+                    <span class="tech-tag">numpy</span>
+                </div>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-icon">📁</span>
+                        <span>~12 KB</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">📝</span>
+                        <span>~200 lines</span>
+                    </div>
+                </div>
+                <a href="Projects/Python/Scalc.zip" class="download-btn" download>
+                    <span class="download-icon">⬇️</span>
+                    <span>Download Project</span>
+                </a>
+            </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Custom cursor with smooth animation
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let followerX = 0, followerY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.5;
+            cursorY += (mouseY - cursorY) * 0.5;
+            
+            followerX += (mouseX - followerX) * 0.25;
+            followerY += (mouseY - followerY) * 0.25;
+            
+            cursor.style.transform = `translate3d(${cursorX - 10}px, ${cursorY - 10}px, 0)`;
+            cursorFollower.style.transform = `translate3d(${followerX - 20}px, ${followerY - 20}px, 0)`;
+            
+            requestAnimationFrame(animateCursor);
+        }
+        
+        animateCursor();
+    </script>
+</body>
+</html>

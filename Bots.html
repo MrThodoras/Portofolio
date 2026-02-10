@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bots</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="Images/icons/ricon.png">
+    <style>
+        :root {
+            --purple-900: #1a0b2e;
+            --purple-800: #2d1b4e;
+            --purple-700: #3f2d5c;
+            --purple-600: #5a3f7d;
+            --purple-500: #7c5295;
+            --purple-400: #a374c9;
+            --purple-300: #c49ddb;
+            --purple-200: #dcc5e8;
+            --accent-pink: #ff6b9d;
+            --accent-cyan: #4ecdc4;
+            --accent-lime: #a8ff3e;
+            --bg-dark: #0d0618;
+            --text-primary: #f5f0ff;
+            --text-secondary: #c49ddb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Static gradient background - FAST */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(122, 82, 149, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(163, 116, 201, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(78, 205, 196, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Lighter noise texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Home Button */
+        .home-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--purple-700), var(--purple-600));
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 50px;
+            border: 2px solid var(--purple-500);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s ease;
+            box-shadow: 0 5px 20px rgba(90, 63, 125, 0.3);
+            will-change: transform;
+        }
+
+        .home-button:hover {
+            transform: translateX(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .home-button::before {
+            content: '←';
+            font-size: 1.5rem;
+            transition: transform 0.15s ease;
+        }
+
+        .home-button:hover::before {
+            transform: translateX(-5px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--purple-300), var(--accent-pink), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Bots Grid */
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            padding: 4rem 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Bot Card */
+        .bot-card {
+            background: linear-gradient(135deg, rgba(47, 27, 78, 0.6), rgba(45, 27, 78, 0.4));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(163, 116, 201, 0.3);
+            border-radius: 25px;
+            padding: 2rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        .bot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(163, 116, 201, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .bot-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-pink);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.3);
+        }
+
+        .bot-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Bot Image */
+        .bot-image {
+            width: 100%;
+            height: 250px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--purple-500);
+            transition: all 0.2s ease;
+        }
+
+        .bot-card:hover .bot-image {
+            border-color: var(--accent-cyan);
+            transform: scale(1.01);
+        }
+
+        /* Bot Title */
+        .bot-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        /* Bot Description */
+        .bot-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Invite Link Container */
+        .invite-container {
+            background: rgba(26, 11, 46, 0.6);
+            border: 2px solid var(--purple-600);
+            border-radius: 15px;
+            padding: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .invite-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--purple-300);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            outline: none;
+            user-select: all;
+        }
+
+        /* Copy Button */
+        .copy-button {
+            padding: 0.35rem 0.6rem;
+            background: linear-gradient(135deg, var(--purple-600), var(--accent-pink));
+            color: var(--text-primary);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            white-space: nowrap;
+            min-width: 60px;
+            will-change: transform;
+        }
+
+        .copy-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
+        }
+
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+
+        .copy-button.copied {
+            background: linear-gradient(135deg, var(--accent-lime), var(--accent-cyan));
+        }
+
+        .copy-icon {
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bots-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .home-button {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 6rem 0 2rem;
+            }
+
+            .invite-container {
+                flex-direction: column;
+            }
+
+            .copy-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Custom cursor effect */
+        @media (pointer: fine) {
+            * {
+                cursor: none;
+            }
+
+            button, a, input[type="button"], input[type="submit"] {
+                cursor: pointer !important;
+            }
+
+            .cursor {
+                width: 20px;
+                height: 20px;
+                border: 2px solid var(--accent-pink);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 9999;
+                mix-blend-mode: difference;
+            }
+
+            .cursor-follower {
+                width: 40px;
+                height: 40px;
+                border: 1px solid var(--purple-400);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 9998;
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Home Button -->
+    <a href="index.html#projects" class="home-button">Home</a>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Discord Bot Creations</h1>
+        </div>
+    </section>
+
+    <!-- Bots Grid -->
+    <section class="container">
+        <div class="bots-grid">
+            <!-- Bot Card 1 -->
+            <div class="bot-card">
+                <img src="Images/Bots/TSABot.png" alt="TSA Bot" class="bot-image">
+                <h2 class="bot-title">🍃 TSA Bot</h2>
+                <p class="bot-description">Advanced community Bot made with pure love!</p>
+                <div class="invite-container">
+                    <input type="text" class="invite-input" value="https://discord.com/oauth2/authorize?client_id=1381972469966962768" readonly>
+                    <button class="copy-button" onclick="copyInvite(this)">
+                        <span class="copy-icon">📋</span>
+                        <span class="copy-text">Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bot Card 2 -->
+            <div class="bot-card">
+                <img src="Images/Bots/Soon.png" alt="Music Bot" class="bot-image">
+                <h2 class="bot-title">🎵 Music Bot</h2>
+                <p class="bot-description">High-quality music streaming for your Discord server. Support for multiple platforms and queue management.</p>
+                <div class="invite-container">
+                    <input type="text" class="invite-input" value="https://discord.com/oauth2/authorize?client_id=YOUR_BOT_ID&permissions=8&scope=bot" readonly>
+                    <button class="copy-button" onclick="copyInvite(this)">
+                        <span class="copy-icon">📋</span>
+                        <span class="copy-text">Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bot Card 3 -->
+            <div class="bot-card">
+                <img src="Images/Bots/Soonp.png" alt="Utility Bot" class="bot-image">
+                <h2 class="bot-title">🔧 Utility Bot</h2>
+                <p class="bot-description">Essential server utilities including polls, reminders, custom commands, and server statistics.</p>
+                <div class="invite-container">
+                    <input type="text" class="invite-input" value="https://discord.com/oauth2/authorize?client_id=YOUR_BOT_ID&permissions=8&scope=bot" readonly>
+                    <button class="copy-button" onclick="copyInvite(this)">
+                        <span class="copy-icon">📋</span>
+                        <span class="copy-text">Copy</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Custom cursor with smooth animation - FAST
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let followerX = 0, followerY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            // Faster interpolation
+            cursorX += (mouseX - cursorX) * 0.5;
+            cursorY += (mouseY - cursorY) * 0.5;
+            
+            followerX += (mouseX - followerX) * 0.25;
+            followerY += (mouseY - followerY) * 0.25;
+            
+            // GPU acceleration
+            cursor.style.transform = `translate3d(${cursorX - 10}px, ${cursorY - 10}px, 0)`;
+            cursorFollower.style.transform = `translate3d(${followerX - 20}px, ${followerY - 20}px, 0)`;
+            
+            requestAnimationFrame(animateCursor);
+        }
+        
+        animateCursor();
+
+        // WORKING Copy invite link function
+        async function copyInvite(button) {
+            const input = button.parentElement.querySelector('.invite-input');
+            const copyText = button.querySelector('.copy-text');
+            const copyIcon = button.querySelector('.copy-icon');
+            const textToCopy = input.value;
+            
+            try {
+                // Method 1: Modern Clipboard API
+                await navigator.clipboard.writeText(textToCopy);
+                
+                // Success!
+                button.classList.add('copied');
+                copyText.textContent = '✓';
+                copyIcon.textContent = '✓';
+                
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    copyText.textContent = 'Copy';
+                    copyIcon.textContent = '📋';
+                }, 2000);
+                
+            } catch (err) {
+                // Method 2: Fallback using textarea
+                const textarea = document.createElement('textarea');
+                textarea.value = textToCopy;
+                textarea.style.position = 'fixed';
+                textarea.style.top = '0';
+                textarea.style.left = '0';
+                textarea.style.width = '2em';
+                textarea.style.height = '2em';
+                textarea.style.padding = '0';
+                textarea.style.border = 'none';
+                textarea.style.outline = 'none';
+                textarea.style.boxShadow = 'none';
+                textarea.style.background = 'transparent';
+                
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (successful) {
+                        button.classList.add('copied');
+                        copyText.textContent = '✓';
+                        copyIcon.textContent = '✓';
+                        
+                        setTimeout(() => {
+                            button.classList.remove('copied');
+                            copyText.textContent = 'Copy';
+                            copyIcon.textContent = '📋';
+                        }, 2000);
+                    } else {
+                        throw new Error('Copy command failed');
+                    }
+                } catch (err2) {
+                    document.body.removeChild(textarea);
+                    alert('Please manually copy: ' + textToCopy);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
