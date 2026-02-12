@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-   <link rel="icon" href="Images/icons/ricon.png">
     <style>
         :root {
             --purple-900: #1a0b2e;
@@ -32,12 +31,21 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             font-family: 'Syne', sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.6;
-            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px;
             position: relative;
         }
 
@@ -144,12 +152,8 @@
             background: linear-gradient(135deg, var(--accent-cyan), var(--purple-600));
         }
 
-        /* Container - Centered with absolute positioning */
+        /* Container - Centered with Flexbox */
         .container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 700px;
             z-index: 10;
         }
@@ -398,7 +402,6 @@
             <h2>Get In Touch</h2>
             <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
                 <input type="hidden" name="access_key" value="78a7197b-3706-414a-b158-a8ee10fad1f3"> 
-                <input type="checkbox" name="botcheck" style="display: none;" tabindex="-1" autocomplete="off">
                 <input type="hidden" name="redirect" value="index.html">
                 
                 <div class="name-title">Full Name</div>
@@ -540,7 +543,7 @@
             }
         });
 
-        // Handle form submission
+        // Handle form submission (using working Web3Forms pattern)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -551,46 +554,60 @@
                 return;
             }
 
-            // Disable submit button
+            const formData = new FormData(form);
+            
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = "Sending...";
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
 
             try {
-                const formData = new FormData(form);
-                const response = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
                     body: formData
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store submission timestamp
+                    // Store submission timestamp for 24-hour rate limit
                     localStorage.setItem('lastContactSubmission', Date.now().toString());
                     
-                    showStatus('Message sent successfully! 🎉', 'success');
+                    showStatus('Message sent successfully! 🎉 Redirecting...', 'success');
                     form.reset();
+                    
+                    // Reset hCaptcha after successful submission
+                    if (window.hcaptcha) {
+                        window.hcaptcha.reset();
+                    }
                     
                     // Set 24-hour cooldown
                     submitBtn.textContent = 'Wait 24h 0m';
                     
-                    // Redirect after 2 seconds
+                    // Redirect after 2 seconds to index.html
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 2000);
                 } else {
-                    throw new Error('Submission failed');
+                    showStatus("Error: " + (data.message || "Please try again"), 'error');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    // Reset hCaptcha on error
+                    if (window.hcaptcha) {
+                        window.hcaptcha.reset();
+                    }
                 }
             } catch (error) {
-                showStatus('Oops! Something went wrong. Please try again.', 'error');
+                showStatus("Something went wrong. Please try again.", 'error');
+                submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Send Message';
+                
+                // Reset hCaptcha on error
+                if (window.hcaptcha) {
+                    window.hcaptcha.reset();
+                }
             }
         });
     </script>
 </body>
-
 </html>
-
-
-
