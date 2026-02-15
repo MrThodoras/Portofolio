@@ -11,12 +11,30 @@
     <link rel="icon" href="Images/icons/ricon.png">
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="#skills" class="nav-link">Skills</a></li>
+                <li class="nav-item"><a href="#certificates" class="nav-link">Certifications</a></li>
+                <li class="nav-item"><a href="#projects" class="nav-link">Projects</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link nav-cta">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
     <!-- Custom cursor (desktop only) -->
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="home">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
@@ -65,7 +83,7 @@
     </section>
 
     <!-- Certificates Section -->
-    <section class="certificates-section">
+    <section class="certificates-section" id="certificates">
         <div class="container">
             <h2 class="section-title">Certifications</h2>
             <div class="cert-container">
@@ -127,6 +145,81 @@
     </footer>
 
     <script>
+        // Navigation toggle
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+        const navbar = document.querySelector('.navbar');
+
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+            document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navbar.contains(e.target) && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Active section tracking
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function setActiveLink() {
+            let currentSection = 'home';
+            const scrollY = window.pageYOffset;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 300;
+                const sectionBottom = sectionTop + section.offsetHeight;
+                const sectionId = section.getAttribute('id');
+
+                if (scrollY >= sectionTop && scrollY < sectionBottom) {
+                    currentSection = sectionId;
+                }
+            });
+
+            // Update active class on nav links
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                
+                // Match the link to the current section
+                if (href === '#' && currentSection === 'home') {
+                    link.classList.add('active');
+                } else if (href === '#' + currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Run on scroll and on load
+        window.addEventListener('scroll', setActiveLink);
+        window.addEventListener('load', setActiveLink);
+        setActiveLink(); // Initial call
+
         // Custom cursor with smooth animation (desktop only)
         const cursor = document.querySelector('.cursor');
         const cursorFollower = document.querySelector('.cursor-follower');
@@ -217,5 +310,4 @@
         }
     </script>
 </body>
-
 </html>
